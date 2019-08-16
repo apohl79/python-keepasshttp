@@ -19,7 +19,7 @@ def jsonMap(fn, json_obj):
         if val is None:
             return None
         elif isinstance(val, dict):
-            return {k: _fn(v) for k, v in val.iteritems()}
+            return {k: _fn(v) for k, v in val.items()}
         elif isinstance(val, list):
             return map(_fn, val)
         else:
@@ -32,4 +32,4 @@ def convertToStr(input_dict):
 
 
 def merge(d1, d2):
-    return dict(itertools.chain(d1.iteritems(), d2.iteritems()))
+    return dict(itertools.chain(d1.items(), d2.items()))

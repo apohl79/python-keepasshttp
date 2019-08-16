@@ -26,7 +26,7 @@ def associate(requestor=None):
     key = crypto.getRandomKey()
     input_data = {
         'RequestType': 'associate',
-        'Key': key
+        'Key': key.decode('ascii')
     }
     output = requestor(key, input_data, None, None)
     return key, output['Id']
@@ -47,11 +47,11 @@ def getLogins(url, id_, key, requestor=None, print_output=False):
     iv = crypto.getRandomIV()
     input_data = {
         'RequestType': 'get-logins',
-        'Url': crypto.encrypt(url, key, iv)
+        'Url': crypto.encrypt(url.encode(), key, iv).decode('ascii')
     }
     output = requestor(key, input_data, id_, iv=iv)
     if print_output:
-        print output
+        print(output)
     decrypted = [
         crypto.decryptDict(entry, key, output['Nonce'])
         for entry in output.get('Entries', [])
@@ -77,8 +77,8 @@ class Requestor(object):
             iv = iv or crypto.getRandomIV()
             standard_data = {
                 'Id': id_,
-                'Nonce': iv,
-                'Verifier': getVerifier(iv, key)
+                'Nonce': iv.decode('ascii'),
+                'Verifier': getVerifier(iv, key).decode('ascii')
             }
         return util.merge(standard_data, input_data)
 
@@ -89,7 +89,7 @@ class Requestor(object):
         if not output['Success']:
             raise common.RequestFailed(
                 'keepass returned a unsuccessful response', response)
-        if not checkVerifier(key, output['Nonce'], output['Verifier']):
+        if not checkVerifier(key, output['Nonce'].encode(), output['Verifier'].encode()):
             raise common.RequestFailed('Failed to verify response', response)
         return output
 DEFAULT_REQUESTOR = Requestor(DEFAULT_KEEPASS_URL)

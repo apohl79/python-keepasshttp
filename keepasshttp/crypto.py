@@ -69,5 +69,5 @@ def encryptDict(dct, key, iv):
 
 def decryptDict(encrypted_dict, key, iv):
     def _decrypt(v):
-        return decrypt(v, key, iv)
+        return decrypt(v, key, iv).decode('utf-8')
     return util.jsonMap(_decrypt, encrypted_dict)
